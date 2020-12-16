@@ -28,8 +28,5 @@ const Burger = (props) => {
     );
 }
 
+
 export default Burger;
-
-//sfc
-
-// reduce permite transformar un array en algo mas
