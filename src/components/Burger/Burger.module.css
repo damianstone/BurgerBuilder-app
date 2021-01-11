@@ -1,8 +1,16 @@
+* {
+    -ms-overflow-style: none;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
 .Burger {
     width: 100%;
     margin:auto;
     height: 250px;
     overflow: scroll;
+    overflow-x: hidden;
     text-align: center;
     font-weight: bold;
     font-size: 1.2rem;

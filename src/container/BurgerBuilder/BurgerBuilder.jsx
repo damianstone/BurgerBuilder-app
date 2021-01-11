@@ -27,6 +27,7 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount() {
+        console.log(this.props);
         axios.get('https://burger-app-36a5c-default-rtdb.firebaseio.com/ingredients.json')
              .then(response => {
                  this.setState({ingredients: response.data})
@@ -86,31 +87,20 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-        this.setState({loading: true});
-        // estructura de como van a llegar los datos
-        const order = {
-            ingredients: this.state.ingredients, 
-            price: this.state.totalPrice,
-            customer: {
-                name: 'Damian',
-                address: {
-                    street: 'Teststreet 1',
-                    zipCode: 'CHU P4L0',
-                    country: 'United Kingdom'
-                },
-                email: 'test@gmail.com',
-            },
-            deliveryMethod: 'fastest'
-        };
-        
-        // /orders.json para crear una rama en la base de datos que se llame orders
-        axios.post('/orders.json', order)
-            .then(response => {
-                this.setState({loading: false, purchasing: false})
-            })
-            .catch(error => {
-                this.setState({loading: false, purchasing: false})
-            });
+        // PASAR LOS INGREDIENTES ESCOGIDOS POR EL USUARIO AL COMPONENTE DE CHECKOUT
+        const queryParams = [];
+
+        for(let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
+            // property name = value of the property | like: salad: 2
+        }
+        queryParams.push('price=' + this.state.totalPrice)
+        const queryString = queryParams.join('&')
+
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + queryString,
+        });
     };
 
     render() {
