@@ -5,8 +5,9 @@ import classes from './NavItems.module.css'
 const NavItems = (props) => {
     return ( 
         <ul className={classes.NavItems}>
-            <NavItem link='/' active >Burger Builder</NavItem>
-            <NavItem link='/' >Checkout</NavItem>
+            <NavItem link='/' exact={true}>Burger Builder</NavItem>
+            <NavItem link='/orders' >Checkout</NavItem>
+            {/* link= es to= pero pasado como props */}
         </ul>
      );
 }
