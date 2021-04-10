@@ -5,6 +5,8 @@ import classes from './ContactData.module.css';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 
+import { connect } from 'react-redux';
+
 class ContactData extends Component {
 
     constructor(props) {
@@ -26,6 +28,7 @@ class ContactData extends Component {
                 maxLength: maxLen,
             },
             valid: false,
+            touched: false,
         };
     };
 
@@ -45,8 +48,11 @@ class ContactData extends Component {
                     ]
                 },
                 value: '',
+                valid: true,
+                validation: {},
             },
         },
+        formIsValid: false,
         loading: false,
     }
     
@@ -61,9 +67,8 @@ class ContactData extends Component {
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value
 
         }
-        // estructura de como van a llegar los datos
         const order = {
-            ingredients: this.props.ingredients, 
+            ingredients: this.props.ings, 
             price: this.props.price,
             orderData: formData,
         };
@@ -82,7 +87,11 @@ class ContactData extends Component {
 
     //VALIDATION
     checkValidation = (value, rules) => {
-        let isValid = false;
+        let isValid = true;
+
+        if (!rules) {
+            return true;
+        }
 
         if (rules.required) {
             isValid = value.trim() !== ''; // if not equal to an empthy string
@@ -107,12 +116,21 @@ class ContactData extends Component {
         };
         // ONCHANGE
         updatedFormElement.value = event.target.value;
+
         // update validation
         updatedFormElement.valid = this.checkValidation(updatedFormElement.value, updatedFormElement.validation)
-        console.log(updatedFormElement)
+        updatedFormElement.touched = true;
         updatedForm[inputIdentifier] = updatedFormElement;
+        
+        // VALIDAR EL FORMULARIO COMPLETO
+        let formIsValid = true;
+        for (let inputIdentifier in updatedForm) {
+            formIsValid = updatedForm[inputIdentifier].valid && formIsValid
+        }
+        console.log(formIsValid)
+
         //CAMBIAR EL ESTADO AL TIPIAR EN LOS CAMPOS
-        this.setState({orderForm: updatedForm})
+        this.setState({orderForm: updatedForm, formIsValid: formIsValid})
     };
 
     render() {
@@ -133,10 +151,13 @@ class ContactData extends Component {
                     elementType={formElement.config.elementType} 
                     elementConfig={formElement.config.elementConfig}
                     value={formElement.config.value}
+                    invalid={!formElement.config.valid}
+                    shouldValidate={formElement.config.validation}
+                    touched={formElement.config.touched}
                     changed={(event) => this.inputChangedHandler(event, formElement.id)}
                     />
                 ))}
-                <Button btnType='Success' clicked={this.orderHandler}>ORDER</Button>
+                <Button btnType='Success' disabled={this.state.formIsValid}>ORDER</Button>
             </form>
         );
 
@@ -152,4 +173,11 @@ class ContactData extends Component {
     };
 };
 
-export default ContactData;
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients,
+        price: state.totalPrice
+    };
+};
+
+export default connect(mapStateToProps)(ContactData);
